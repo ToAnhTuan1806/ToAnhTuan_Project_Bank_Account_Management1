@@ -21,10 +21,11 @@ struct AccountInfo{
 };
 
 struct User{
-	char userId[10];
+	char userId[15];
 	char name[20];
+	struct Date dateOfBirth;
 	bool gender;
-	char phone[10];
+	char phone[11];
 	char email[20];
 	char password[15];
 	char status[10];

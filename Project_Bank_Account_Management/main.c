@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     int currentLength = 0;
-    int choice, usChoice, adChoice;
+    int choice, adChoice;
     
     do {
         menuStart();
@@ -34,12 +34,13 @@ int main(int argc, char *argv[]) {
                             showUsersData(users, currentLength);
                             break;
                         case 3:
-                        	softUsersByName(users, currentLength);
+                        	
                             break;
                         case 4:
                         	searchUsersByName(users, currentLength);
                             break;
                         case 5:
+                        	softUsersByName(users, currentLength);
                             break;
                         case 6:
                             break;
