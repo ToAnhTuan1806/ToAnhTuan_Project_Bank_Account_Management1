@@ -4,29 +4,14 @@ struct Date{
 	int month, day, year;
 };
 
-struct Transaction{
-	char transferId[10];
-	char receivingId[10];
-	double amount;
-	char type[10]; // deposit / transfer / withdraw
-	char message[50];
-	struct Date transactionDate;	
-};
-
-struct AccountInfo{
-	char userId[20];
-	float balance;
-	bool status;
-	struct Transaction transactionHistory[];
-};
-
 struct User{
-	char userId[15];
+	char userId[11];
 	char name[20];
 	struct Date dateOfBirth;
 	bool gender;
 	char phone[11];
 	char email[20];
+	char userName[20];
 	char password[15];
 	char status[10];
 };

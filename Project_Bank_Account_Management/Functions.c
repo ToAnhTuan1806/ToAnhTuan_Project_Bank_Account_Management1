@@ -2,6 +2,7 @@
 #include "Functions.h"
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 void menuStart() {
 	printf("\n***Bank Management System Using C***\n");
@@ -13,7 +14,7 @@ void menuStart() {
 	printf("========================\n");
 }
 
-void menuAdmin() {
+void menuAdmin() {	
 	printf("\n***Bank Management System Using C***\n");
 	printf("\n    MENU");
 	printf("\n========================\n");
@@ -21,224 +22,493 @@ void menuAdmin() {
 	printf("[2] Show All users.\n");
 	printf("[3] Show detail an user.\n");
 	printf("[4] Lock (Unkock) an user.\n");
-	printf("[5] User Guideline.\n");
-	printf("[6] About Us.\n");
+	printf("[5] Search users by name.\n");
+	printf("[6] Search users by Id.\n");
+	printf("[7] Soft users by name.\n");
 	printf("[0] Exit the program.\n");
 	printf("\n========================\n");				
 }
 
 void addUsers(struct User users[], int *length) {
-printf("*** Add a new user ***\n");
-    struct User newUser;
+    int numUsers;
+    printf("Add number of Users: ");
+    scanf("%d", &numUsers);
+    getchar();  
+	
+	int valid;
     int i, j;
-    int check;
+    for (i=0; i<numUsers; i++) {
+        int check;
         do {
-            printf("\nEnter the User ID (at least 10 characters): ");
-            scanf("%s", newUser.userId);
-            getchar();
-            check=(strlen(newUser.userId)>=10);
-        	if(check==0){
-        		printf("ID must be up to 10 characters. Try again!\n");	
-				} else {
-					check=1;
-                    for (i=0; i<*length; i++) {
-                        if (strcmp(users[i].userId, newUser.userId)==0) {
+            check=1;
+            printf("\nEnter the ID (up to 10 characters): ");
+            if(scanf("%10s", users[*length].userId)!=1) {
+                printf("Invalid input. Try again!\n");
+                getchar();
+                check=0;
+            } else {
+                if(strlen(users[*length].userId)>=10) {
+                    printf("ID must be up to 10 characters. Try again!\n");
+                    getchar();  
+                    check=0;
+                } else {
+                    for (j=0; j<*length; j++) {
+                        if (strcmp(users[j].userId, users[*length].userId)==0) {
                             printf("Duplicate ID. Try again!\n");
                             check=0;
                             break;
                         }
                     }
                 }
+            }
+            fflush(stdin);
         } while (check==0);
 
         do {
-            printf("Enter the name: ");  
-	        fgets(newUser.name, sizeof(newUser.name), stdin);  
-	        newUser.name[strcspn(newUser.name, "\n")] = 0; 
-	        
-	        check=(strlen(newUser.name)>0);  
-	        if(check==0) {  
-	            printf("Name cannot be empty. Try again!\n");  
-	        }  
+            check=1;
+            printf("Enter the name: ");
+            fgets(users[*length].name, sizeof(users[*length].name), stdin);
+            users[*length].name[strcspn(users[*length].name, "\n")] = '\0';  
+            valid=0;
+            for(i=0; users[*length].name[i]!='\0'; i++){
+            	if(users[*length].name[i]!= ' '){
+            		valid=1;
+            		break;
+				}
+			}
+            if(valid==0) {
+                printf("Name can't be empty. Try again!\n");
+                check=0;
+            } 
+            fflush(stdin); 
         } while(check==0);
 
         do {
-            printf("Enter the email: ");  
-	        fgets(newUser.email, sizeof(newUser.email), stdin);  
-	        newUser.email[strcspn(newUser.email, "\n")] = 0;  
-	        
-	        check=(strlen(newUser.email)>0);  
-	        if (check==0) {  
-	            printf("Email cannot be empty. Try again!\n");  
-	        } else {  
-	            check= 1; 
-	            for (i=0; i<*length; i++) {  
-	                if (strcmp(users[i].email, newUser.email) == 0) {  
-	                    printf("Duplicate email. Try again!\n");  
-	                    check= 0;
-	                    break;  
-	                }  
-	            }  
-	        }  
+            check=1;
+            printf("Enter the gender (1 is male, 0 is female): ");
+            char genderInput[2];
+            fgets(genderInput, sizeof(genderInput), stdin);
+            if(genderInput[0]=='1') {
+                users[*length].gender=true;
+            } else if(genderInput[0]=='0') {
+                users[*length].gender=false;
+            } else {
+                printf("Invalid input. Enter 1 or 0!\n");
+                check=0;
+            }
+            fflush(stdin); 
         } while(check==0);
 
         do {
-            printf("Enter the phone: ");  
-	        fgets(newUser.phone, sizeof(newUser.phone), stdin);  
-	        newUser.phone[strcspn(newUser.phone, "\n")] = 0;  
-	        
-	        check=(strlen(newUser.phone)>0);  
-	        if(check==0) {  
-	            printf("Phone cannot be empty. Try again!\n");  
-	        }  
+            check=1;
+            printf("Enter the email: ");
+            fgets(users[*length].email, sizeof(users[*length].email), stdin);
+            users[*length].email[strcspn(users[*length].email, "\n")] = '\0';
+			
+			valid=0;
+			for(i=0; users[*length].email[i]!='\0'; i++){
+            	if(users[*length].email[i]!= ' '){
+            		valid=1;
+            		break;
+				}
+			}
+            if(strlen(users[*length].email)==0 || valid==0) {
+                printf("Email can't be empty. Try again!\n");
+                check = 0;
+            } else if(users[*length].email[0]=='@'){
+				printf("Email can not start with'@'. Try again!\n");
+				check=0;			
+			} else {
+                for(j=0; j<*length; j++) {
+                    if(strcmp(users[j].email, users[*length].email)==0) {
+                        printf("Duplicate email. Try again!\n");
+                        check=0;
+                        break;
+                    }
+                }
+            }
+            fflush(stdin); 
+        } while(check==0);
+
+        do {
+            check=1;
+            printf("Enter the phone (exactly 10 characters): ");
+            if(scanf("%10s", users[*length].phone)!=1) {
+                printf("Invalid input. Try again!\n");
+                getchar();
+                check=0;
+            } else {
+                if(strlen(users[*length].phone)!=10) {
+                    printf("Phone must be exactly 10 characters. Try again!\n");
+                    getchar();  
+                    check=0;
+                } else {
+                    for(j = 0; j<*length; j++) {
+                        if(strcmp(users[j].phone, users[*length].phone)==0){
+                            printf("Duplicate phone number. Try again!\n");
+                            check = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+            fflush(stdin); 
         } while(check==0);
     	
 		do {
-            printf("Enter the gender (1: Male, 0: Female): ");  
-	        scanf("%d", &newUser.gender);  
-	        getchar();
-	        check=(newUser.gender==0 || newUser.gender==1);  
-	        if(check==0) {  
-	            printf("Gender must be 0 or 1. Try again!\n");  
-	        }  
+		    check = 1;
+		    printf("Enter the date of birth (dd/mm/yyyy):\n");
+		    printf("   Enter the day: ");
+		    scanf("%d", &users[*length].dateOfBirth.day);
+		    printf("   Enter the month: ");
+		    scanf("%d", &users[*length].dateOfBirth.month);
+		    printf("   Enter the year: ");
+		    scanf("%d", &users[*length].dateOfBirth.year);
+		    getchar();
+			
+			if (users[*length].dateOfBirth.month < 1 || users[*length].dateOfBirth.month > 12) {
+		        printf("Invalid month. Try again!\n");
+		        check = 0;
+		        continue;
+		    }
+		    switch(users[*length].dateOfBirth.month) {
+		        case 2:
+		            if((users[*length].dateOfBirth.year%4==0 && users[*length].dateOfBirth.year%100!=0) || (users[*length].dateOfBirth.year%400==0)) {
+		                if (users[*length].dateOfBirth.day<1 || users[*length].dateOfBirth.day>29) {
+		                    printf("Invalid date, this is a leap year, try again!\n");
+		                    check=0;
+		                }
+		            } else{
+		                if(users[*length].dateOfBirth.day<1 || users[*length].dateOfBirth.day>28) {
+		                    printf("Invalid date, this is not a leap year, try again!\n");
+		                    check=0;
+		                }
+		            }
+		            break;
+		        case 1:
+		        case 3:
+		        case 5:
+		        case 7:
+		        case 8:
+		        case 10:
+		        case 12:
+		            if(users[*length].dateOfBirth.day<1 || users[*length].dateOfBirth.day>31) {
+		                printf("Invalid day for this month. Try again!\n");
+		                check=0;
+		            }
+		            break;
+		        case 4:
+		        case 6:
+		        case 9:
+		        case 11:
+		            if (users[*length].dateOfBirth.day<1 || users[*length].dateOfBirth.day>30) {
+		                printf("Invalid day for this month. Try again!\n");
+		                check=0;
+		            }
+		            break;
+		        default:
+		            printf("Invalid month. Try again!\n");
+		            check = 0;
+		            break;
+		  	  	}
+		} while (check == 0);
+
+		
+		do {
+            check=1;
+            printf("Enter the Username: ");
+            fgets(users[*length].userName, sizeof(users[*length].userName), stdin);
+            users[*length].userName[strcspn(users[*length].userName, "\n")] = '\0';  
+            
+            valid=0;
+            for(i=0; users[*length].userName[i]!='\0'; i++){
+            	if(users[*length].userName[i]!= ' ' ){
+            		valid=1;
+            		break;
+				}
+			}
+            if(strlen(users[*length].userName)==0 || valid==0) {
+                printf("User name can't be empty. Try again!\n");
+                check=0;
+            } else {
+                    for (j=0; j<*length; j++) {
+                        if (strcmp(users[j].userName, users[*length].userName)==0) {
+                            printf("Duplicate user name. Try again!\n");
+                            check=0;
+                            break;
+                        }
+                    }
+                }
+            fflush(stdin); 
         } while(check==0);
 
-		printf("Enter the date of birth:\n");  
-	    do {  
-	        printf("Enter the day: ");  
-	        scanf("%d", &newUser.dateOfBirth.day);  
-	        printf("Enter the month: ");  
-	        scanf("%d", &newUser.dateOfBirth.month);  
-	        printf("Enter the year: ");  
-	        scanf("%d", &newUser.dateOfBirth.year);  
-	        
-	       	check=(newUser.dateOfBirth.day >= 1 && newUser.dateOfBirth.day <= 31 &&  
-	                  newUser.dateOfBirth.month >= 1 && newUser.dateOfBirth.month <= 12 &&  
-	                  newUser.dateOfBirth.year > 1900);  
-	        if(check==0) {  
-	            printf("Invalid date of birth. Try again!\n");  
-	        }  
-	    } while(check==0);  
-	    
-	    users[*length] = newUser;
         strcpy(users[*length].password, users[*length].phone);  
         strcpy(users[*length].status, "Open");
 
         (*length)++;
         printf("\nUser added successfully!\n");
-    
+    }
+        char choice;
+        printf("\nGo back (b)? or Exit (0)?: ");
+        scanf(" %c", &choice);
+        if (choice=='b' || choice=='B') {
+            return;
+        } else if (choice=='0') {
+            exit(0);
+        }	
 }
-//done
+
 void showUsersData(struct User users[], int length) {
 	if (length == 0) {  
         printf("No users available.\n");  
         return;  
     }  
-	printf("|============|=================|======================|============|========|\n");
-	printf("| %-10s | %-15s | %-20s | %-10s | %-6s |\n", "ID", "Name", "Email", "Phone", "Status");  
-    printf("|============|=================|======================|============|========|\n");
+	printf("\n|============|======================|======================|============|========|\n");
+	printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n", "ID", "Name", "Email", "Phone", "Status");  
+    printf("|============|======================|======================|============|========|\n");
  
   	int i;
     for (i=0; i<length; i++) {  
-        printf("| %-10s | %-15s | %-20s | %-10s | %-6s |\n",   
+        printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n",   
                 users[i].userId, users[i].name, users[i].email, users[i].phone, users[i].status);  
-        printf("|------------|-----------------|----------------------|------------|--------|\n"); 
+        printf("|------------|----------------------|----------------------|------------|--------|\n"); 
+    }
+	char choice;
+        printf("\nGo back (b)? or Exit (0)?: ");
+        scanf(" %c", &choice);
+        if (choice=='b' || choice=='B') {
+            return;
+        } else if (choice=='0') {
+            exit(0);
+        }	
+        
+}
+
+void showDigitalUsersData(struct User users[], int length) {
+    if (length == 0) {  
+        printf("No users available.\n");  
+        return;  
+    }  
+
+    printf("\n|============|======================|======================|============|========|========|=============|=================|\n");
+    printf("| %-10s | %-20s | %-20s | %-10s | %-6s | %-6s | %-11s | %-15s |\n", 
+           "ID", "Name", "Email", "Phone", "Gender", "Status", "Birth Date", "Username");  
+    printf("|============|======================|======================|============|========|========|=============|=================|\n");
+
+	int i;
+    for (i = 0; i < length; i++) {  
+        printf("| %-10s | %-20s | %-20s | %-10s | %-6s | %-6s | %02d/%02d/%04d  | %-15s |\n",   
+                users[i].userId, users[i].name, users[i].email, users[i].phone, (users[i].gender == 1 ? "Male" : "Female"), 
+                users[i].status, users[i].dateOfBirth.day, users[i].dateOfBirth.month, users[i].dateOfBirth.year,users[i].userName);  
+        printf("|------------|----------------------|----------------------|------------|--------|--------|-------------|-----------------|\n"); 
+    }  
+
+    char choice;
+    printf("\nGo back (b)? or Exit (0)?: ");
+    scanf(" %c", &choice);
+    if (choice == 'b' || choice == 'B') {
+        return;
+    } else if (choice == '0') {
+        exit(0);
     }  
 }
 
-void showUsersDetails(struct User users[], int length) {  
-    printf("\n|=================|=================================|\n");  
-/*	printf("| %-15s | %-33s |\n", "UserID", user.userId);  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %-33s |\n", "Name", user.name);  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %-33s |\n", "Email", user.email);  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %-33s |\n", "Phone", user.phone);  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %-33s |\n", "Gender", user.gender == 1 ? "Male" : "Female");  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %02d/%02d/%04d                    |\n", "Date of Birth", user.dateOfBirth.day, user.dateOfBirth.month, user.dateOfBirth.year);  
-    printf("|-----------------|---------------------------------|\n");  
-    printf("| %-15s | %-33s |\n", "Status", user.status);  
-*/    printf("|=================|=================================|\n");  
-}  
-//done
 void softUsersByName(struct User users[], int length) {
 	printf("\n***Sort Order***\n");
     printf("====================\n");
-    printf("[1] Ascending.\n");
-    printf("[2] Descending.\n");
+    printf("[1] Ascending(A-Z, a-z).\n");
+    printf("[2] Descending(Z-A, z-a).\n");
     printf("[0] Exit Sorting.\n");
     printf("====================\n");
 	int choice;
-	printf("Enter the choice: ");
-	scanf("%d", &choice);
-	getchar();
-	
-	if(choice==1 || choice==2) {
+	int check=0;
+	struct User tempUsers[length];
+	while(check==0){
+		printf("Enter the choice: ");
+		scanf("%d", &choice);
+		getchar();
+		
 		int i, j;
-		for(i=0; i<length-1; i++){
-			for(j=i+1; j<length; j++){
-				int comparison=strcmp(users[i].name, users[j].name);
-				if((choice==1&&comparison>0) || (choice==2&&comparison<0)) {
-					temp=users[i];
-					users[i]=users[j];
-					users[j]=temp;
-				}
+		if(choice==1 || choice==2){
+			for(i=0; i<length; i++){
+				tempUsers[i]=users[i];
 			}
+			
 		}
-		printf("\nSoft successfully.\n");
-		showUsersData(users, length);
-	} else if(choice==0) {
-		printf("\nExit sort menu\n");
-	} else {
-		printf("Invalid choice.");
+		switch(choice){
+			case 1:
+				for(i=0; i<length-1; i++){
+					for(j=0; j<length-i-1; j++){
+						if(strcmp(tempUsers[j].name, tempUsers[j+1].name)>0){
+							temp=tempUsers[j];
+							tempUsers[j]=tempUsers[j+1];
+							tempUsers[j+1]=temp;
+						}
+					}
+				}
+				printf("\nSorted in ascending order successfully.\n");
+				showUsersData(tempUsers, length);
+				check=1;
+                break;
+            case 2:
+				for(i=0; i<length-1; i++){
+					for(j=0; j<length-i-1; j++){
+						if(strcmp(tempUsers[j].name, tempUsers[j+1].name)<0){
+							temp=tempUsers[j];
+							tempUsers[j]=tempUsers[j+1];
+							tempUsers[j+1]=temp;
+						}
+					}
+				}
+				printf("\nSorted in descending order successfully.\n");
+				showUsersData(tempUsers, length);
+				check=1;
+                break; 
+			case 0:
+				printf("\nExit sort menu.\n");
+				check=1;
+				break;
+				default:
+					printf("Invalid choice. Try again.\n");	  
+		}
 	}
 } 
-//done
+
 void searchUsersByName(struct User users[], int length) { 
 	char searchName[50];
-	int found=-1;
+	int found=0;
 	printf("Enter the name to search: ");
 	fgets(searchName, sizeof(searchName), stdin);
 	searchName[strcspn(searchName, "\n")]=0;
 	int i;
 	for(i=0; i<length; i++){
 		if(strstr(users[i].name, searchName)!=NULL) {
-			if(found==-1) {
-				printf("|============|=================|======================|============|========|\n");
-			    printf("| %-10s | %-15s | %-20s | %-10s | %-6s |\n", "ID", "Name", "Email", "Phone", "Status");  
-			    printf("|============|=================|======================|============|========|\n");
+			if(found==0) {
+				printf("\n|============|======================|======================|============|========|\n");
+			    printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n", "ID", "Name", "Email", "Phone", "Status");  
+			    printf("|============|======================|======================|============|========|\n");
 			}
-		printf("| %-10s | %-15s | %-20s | %-10s | %-6s |\n", users[i].userId, users[i].name, users[i].email, users[i].phone, users[i].status);  
-        printf("|------------|-----------------|----------------------|------------|--------|\n");
-        found = 1;
+		printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n", users[i].userId, users[i].name, users[i].email, users[i].phone, users[i].status);  
+        printf("|------------|----------------------|----------------------|------------|--------|\n");
+        found=1;
         }
     }
-        if(found ==-1){
+        if(found==0){
 		printf("\nNo users found with the name containing \"%s\".\n", searchName);
-		
 	}
+    char choice;
+        printf("\nGo back (b)? or Exit (0)?: ");
+        scanf(" %c", &choice);
+        if (choice=='b' || choice=='B') {
+            return;
+        } else if (choice=='0') {
+            exit(0);
+        }	
 }	
 
-void lockUnlockUsers(struct User users[], int length) {
-	char id[11], choice;
+void searchUsersById(struct User users[], int length) {
+	char searchId[20];
 	int found=0;
-	printf("Enter the user ID to lock/unlock: ");
-	scanf("%10s", id);
-	int i;
-	for(i=0; i<length; i++){
-		if(strcmp(users[i].userId, id)==0){
-			found=1;
-			if(strcmp(users[i].status, "Open")==0){
-				printf("");
-			}
+	int valid=0;
+	while(valid==0){
+		printf("Enter the user ID to search: ");
+		fgets(searchId, sizeof(searchId), stdin);
+		searchId[strcspn(searchId, "\n")]=0;
+		if(strlen(searchId)>=10) {
+			printf("ID must be up to 10 characters. Try again!\n");
+		} else {
+			valid=1;
 		}
 	}
-	
+	int i;
+	for(i=0; i<length; i++) {
+		if(strcmp(users[i].userId, searchId)==0){
+			printf("\n|============|======================|======================|============|========|\n");
+			printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n", "ID", "Name", "Email", "Phone", "Status");  
+		    printf("|============|======================|======================|============|========|\n");
+			printf("| %-10s | %-20s | %-20s | %-10s | %-6s |\n", users[i].userId, users[i].name, users[i].email, users[i].phone, users[i].status);  
+	        printf("|------------|----------------------|----------------------|------------|--------|\n");
+	        found=1;
+	        break;
+		}
+	}
+	if(found==0){
+		printf("\nNo user found with the ID \"%s\"\n", searchId);
+	}
+	char choice;
+        printf("\nGo back (b)? or Exit (0)?: ");
+        scanf(" %c", &choice);
+        if (choice=='b' || choice=='B') {
+            return;
+        } else if (choice=='0') {
+            exit(0);
+        }	
+}
+
+void lockUnlockUsers(struct User users[], int length) {
+    char id[11], choice;
+    int check=0;
+    printf("Enter the user ID to lock/unlock: ");
+    fgets(id, sizeof(id), stdin);
+    id[strcspn(id, "\n")]='\0';
+    int i;
+    for (i=0; i<length; i++) {
+        if (strcmp(users[i].userId, id)==0) {
+            check=1;
+            if (strcmp(users[i].status, "Open")==0) {
+                printf("User is unlocking, do you want to lock this user? (y/n): ");
+                scanf(" %c", &choice);
+                if (choice=='y' || choice=='Y') {
+                    strcpy(users[i].status, "Locked");
+                    printf("Unlock user successul.\n");
+                } else {
+                    printf("User status does not change.\n");
+                }
+            }
+            else if (strcmp(users[i].status, "Locked")==0) {
+                printf("User is locked, do you want to unlock this user? (y/n): ");
+                scanf(" %c", &choice);
+                if (choice =='y' || choice=='Y') {
+                    strcpy(users[i].status, "Open");
+                    printf("Lock user successul.\n");
+                } else {
+                    printf("User status does not change.\n");
+                }
+            }
+            break;
+        }
+    }
+    if(check==0){
+        printf("No user was found for id: %s", id);
+        printf("\n");
+    }
+        printf("\nGo back (b)? or Exit (0)?: ");
+        scanf(" %c", &choice);
+        if (choice=='b' || choice=='B') {
+            return;
+        } else if (choice=='0') {
+            exit(0);
+        }	
 }
 		
-void saveUsersFromFile();
-void loadUsersFromFile();
+void saveUsersToFile(struct User users[], int length) {
+	FILE *file=fopen("Bank_account_management.dat", "wb");
+	if(file==NULL){
+		printf("Error open file!");
+		return;
+	}
+	fwrite(users, sizeof(struct User), length, file);
+	fclose(file);
+}
+
+void loadUsersFromFile(struct User users[], int *length) {
+	FILE *file=fopen("Bank_account_management.dat", "rb");
+	if(file==NULL){
+		printf("Error open file!");
+		return;
+	}
+	*length= fread(users, sizeof(struct User), 100, file);
+	fclose(file);
+}
+
 
